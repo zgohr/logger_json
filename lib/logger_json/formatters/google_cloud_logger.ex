@@ -26,7 +26,7 @@ defmodule LoggerJSON.Formatters.GoogleCloudLogger do
         time: format_timestamp(ts),
         severity: unquote(gcp_level),
         log: format_log(binary_iodata, md),
-      } |> Map.merge(format_metadata(md, md_keys)))
+      } |> Map.merge(format_metadata(md, md_keys))
         |> Map.put(:serviceContext, json_map(service: Mix.Project.config[:app]))
         |> maybe_put(:message, format_stack_trace(binary_iodata, md))
     end

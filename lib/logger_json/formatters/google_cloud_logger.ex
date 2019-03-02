@@ -20,14 +20,31 @@ defmodule LoggerJSON.Formatters.GoogleCloudLogger do
   """
   for {level, gcp_level} <- @severity_levels do
     def format_event(unquote(level), msg, ts, md, md_keys) do
+      binary_iodata = IO.iodata_to_binary(msg)
+
       Map.merge(
         %{
           time: format_timestamp(ts),
           severity: unquote(gcp_level),
-          log: IO.iodata_to_binary(msg)
-        },
-        format_metadata(md, md_keys)
-      )
+          log: format_log(binary_iodata, md),
+
+        }, format_metadata(md, md_keys))
+        |> maybe_put(:"logging.googleapis.com/serviceContext", Mix.Project.config[:app])
+        |> maybe_put(:"logging.googleapis.com/message", format_stack_trace(binary_iodata, md))
+    end
+  end
+
+  defp format_log(msg, md) do
+    case Keyword.fetch(md, :error_logger) do
+      {:ok, :format} -> nil
+      _ -> msg
+    end
+  end
+
+  defp format_stack_trace(msg, md) do
+    case Keyword.fetch(md, :error_logger) do
+      {:ok, :format} -> msg
+      _ -> nil
     end
   end
 

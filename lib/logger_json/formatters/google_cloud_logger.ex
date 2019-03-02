@@ -29,8 +29,8 @@ defmodule LoggerJSON.Formatters.GoogleCloudLogger do
           log: format_log(binary_iodata, md),
 
         }, format_metadata(md, md_keys))
-        |> maybe_put(:"logging.googleapis.com/serviceContext", Mix.Project.config[:app])
-        |> maybe_put(:"logging.googleapis.com/message", format_stack_trace(binary_iodata, md))
+        |> maybe_put(:serviceContext, Mix.Project.config[:app])
+        |> maybe_put(:message format_stack_trace(binary_iodata, md))
     end
   end
 

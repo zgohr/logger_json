@@ -22,14 +22,12 @@ defmodule LoggerJSON.Formatters.GoogleCloudLogger do
     def format_event(unquote(level), msg, ts, md, md_keys) do
       binary_iodata = IO.iodata_to_binary(msg)
 
-      Map.merge(
-        %{
-          time: format_timestamp(ts),
-          severity: unquote(gcp_level),
-          log: format_log(binary_iodata, md),
-
-        }, format_metadata(md, md_keys))
-        |> maybe_put(:serviceContext, Mix.Project.config[:app])
+      %{
+        time: format_timestamp(ts),
+        severity: unquote(gcp_level),
+        log: format_log(binary_iodata, md),
+      } |> Map.merge(format_metadata(md, md_keys)))
+        |> Map.put(:serviceContext, json_map(service: Mix.Project.config[:app]))
         |> maybe_put(:message, format_stack_trace(binary_iodata, md))
     end
   end
